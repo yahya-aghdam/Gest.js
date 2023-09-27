@@ -1,0 +1,40 @@
+{
+  "name": "gest",
+  "version": "1.0.0",
+  "description": "SDK for working with openStreetMap REST API",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-specifier-resolution=node --loader ts-node/esm ./src/test/main.ts"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scorpio-demon/Gest.js.git"
+  },
+  "keywords": [
+    "Nest",
+    "Nest.js",
+    "geocoding",
+    "map",
+    "SDK",
+    "openStreetMap",
+    "Open Street Map",
+    "OSM"
+  ],
+  "author": "Radmehr Aghdam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scorpio-demon/Gest.js/issues"
+  },
+  "homepage": "https://github.com/scorpio-demon/Gest.js#readme",
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/url-join": "^4.0.1",
+    "url-join": "^5.0.0"
+  }
+}
