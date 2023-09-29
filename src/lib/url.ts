@@ -1,6 +1,6 @@
-import { urlT } from "../interface";
+import { urlObjT } from "../interface";
 
-export const url:urlT = {
-  main: "https://api.openstreetmap.org/",
-  dev: "https://master.apis.dev.openstreetmap.org/",
+export const url:urlObjT = {
+  main: "https://api.openstreetmap.org/api",
+  dev: "https://master.apis.dev.openstreetmap.org/api",
 };
