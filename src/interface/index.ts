@@ -32,3 +32,5 @@ export type changesetGetQueryT = {
   changesets?: string | string[];
   limit?: number | string;
 };
+
+export type strOrInt = string | number;

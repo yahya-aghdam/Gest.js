@@ -1,5 +1,5 @@
 import isEmpty from "lodash/isEmpty";
-import { boxT, changesetGetQueryT } from "./interface";
+import { boxT, changesetGetQueryT, strOrInt } from "./interface";
 import { fetcher } from "./lib/handler";
 import { url } from "./lib/url";
 import urljoin from "url-join";
@@ -18,6 +18,10 @@ export default class Gest {
 
   private formHeader: any = {
     "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  private multiPartFormHeader: any = {
+    "Content-Type": "multipart/form-data",
   };
 
   jsonDefiner(path: string, returnMethod: "xml" | "json" = "json") {
@@ -81,7 +85,7 @@ export default class Gest {
   }
 
   async changesetGet(
-    id: string | number,
+    id: strOrInt,
     include_discussion: boolean = true,
     returnMethod: "json" | "xml" = "json"
   ) {
@@ -90,17 +94,17 @@ export default class Gest {
     return await this.get(path);
   }
 
-  async changesetUpdate(id: string | number, xmlBody: any) {
+  async changesetUpdate(id: strOrInt, xmlBody: any) {
     const path = `changeset/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async changesetClose(id: string | number) {
+  async changesetClose(id: strOrInt) {
     const path = `changeset/${id}/close`;
     return await this.put(path);
   }
 
-  async changesetDownload(id: string | number) {
+  async changesetDownload(id: strOrInt) {
     const path = `changeset/${id}/download`;
     return await this.get(path);
   }
@@ -162,37 +166,37 @@ export default class Gest {
     return await this.get(path);
   }
 
-  async changesetDiffUpload(id: string | number, xmlBody: any) {
+  async changesetDiffUpload(id: strOrInt, xmlBody: any) {
     const path = `changeset/${id}/create`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
   //! auth needed
-  async changesetComment(id: string | number, comment: any) {
+  async changesetComment(id: strOrInt, comment: any) {
     const path = `changeset/${id}/create`;
     return await this.post(path, this.formHeader, comment);
   }
 
   //! auth needed
-  async changesetSubscribe(id: string | number) {
+  async changesetSubscribe(id: strOrInt) {
     const path = `changeset/${id}/subscribe`;
     return await this.post(path, this.formHeader);
   }
 
   //! auth needed
-  async changesetUnsubscribe(id: string | number) {
+  async changesetUnsubscribe(id: strOrInt) {
     const path = `changeset/${id}/unsubscribe`;
     return await this.post(path, this.formHeader);
   }
 
   //! auth needed
-  async changesetHideComment(id: string | number) {
+  async changesetHideComment(id: strOrInt) {
     const path = `changeset/comment/${id}/hide`;
     return await this.post(path);
   }
 
   //! auth needed
-  async changesetUnhideComment(id: string | number) {
+  async changesetUnhideComment(id: strOrInt) {
     const path = `changeset/comment/${id}/unhide`;
     return await this.post(path);
   }
@@ -212,56 +216,159 @@ export default class Gest {
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async getNode(id: string | number, returnMethod: "json" | "xml" = "json") {
+  async getNode(id: strOrInt, returnMethod: "json" | "xml" = "json") {
     const path = `node/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async getWay(id: string | number, returnMethod: "json" | "xml" = "json") {
+  async getWay(id: strOrInt, returnMethod: "json" | "xml" = "json") {
     const path = `way/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async getRelation(
-    id: string | number,
-    returnMethod: "json" | "xml" = "json"
-  ) {
+  async getRelation(id: strOrInt, returnMethod: "json" | "xml" = "json") {
     const path = `relation/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async updateNode(id: string | number, xmlBody: any) {
+  async updateNode(id: strOrInt, xmlBody: any) {
     const path = `node/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async updateWay(id: string | number, xmlBody: any) {
+  async updateWay(id: strOrInt, xmlBody: any) {
     const path = `way/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async updateRelation(id: string | number, xmlBody: any) {
+  async updateRelation(id: strOrInt, xmlBody: any) {
     const path = `relation/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async deleteNode(id: string | number, xmlBody: any) {
+  async deleteNode(id: strOrInt, xmlBody: any) {
     const path = `node/${id}`;
     return await this.delete(path, this.xmlHeader, xmlBody);
   }
 
-  async deleteWay(id: string | number, xmlBody: any) {
+  async deleteWay(id: strOrInt, xmlBody: any) {
     const path = `way/${id}`;
     return await this.delete(path, this.xmlHeader, xmlBody);
   }
 
-  async deleteRelation(id: string | number, xmlBody: any) {
+  async deleteRelation(id: strOrInt, xmlBody: any) {
     const path = `relation/${id}`;
     return await this.delete(path, this.xmlHeader, xmlBody);
   }
 
-  async getNodeHistory(id: string | number) {
+  async getNodeHistory(id: strOrInt) {
     const path = `node/${id}/history`;
     return await this.get(path);
+  }
+
+  async getWayHistory(id: strOrInt) {
+    const path = `way/${id}/history`;
+    return await this.get(path);
+  }
+
+  async getRelationHistory(id: strOrInt) {
+    const path = `relation/${id}/history`;
+    return await this.get(path);
+  }
+
+  async getNodeVersion(id: strOrInt, version: strOrInt) {
+    const path = `node/${id}/${version}`;
+    return await this.get(path);
+  }
+
+  async getWayVersion(id: strOrInt, version: strOrInt) {
+    const path = `way/${id}/${version}`;
+    return await this.get(path);
+  }
+
+  async getRelationVersion(id: strOrInt, version: strOrInt) {
+    const path = `relation/${id}/${version}`;
+    return await this.get(path);
+  }
+
+  async getNodesParameters(parameters: any[]) {
+    const path = `nodes?nodes=${parameters}`;
+    return await this.get(path);
+  }
+
+  async getWaysParameters(parameters: any[]) {
+    const path = `ways?ways=${parameters}`;
+    return await this.get(path);
+  }
+
+  async getRelationsParameters(parameters: any[]) {
+    const path = `relations?relations=${parameters}`;
+    return await this.get(path);
+  }
+
+  async getRelationsForNode(id: strOrInt) {
+    const path = `node/${id}/relations`;
+    return await this.get(path);
+  }
+
+  async getRelationsForWay(id: strOrInt) {
+    const path = `way/${id}/relations`;
+    return await this.get(path);
+  }
+
+  async getRelationsForRelation(id: strOrInt) {
+    const path = `relation/${id}/relations`;
+    return await this.get(path);
+  }
+
+  async getWaysForNode(id: strOrInt) {
+    const path = `node/${id}/ways`;
+    return await this.get(path);
+  }
+
+  async fullGetWay(id: strOrInt) {
+    const path = `way/${id}/full`;
+    return await this.get(path);
+  }
+
+  async fullGetRelation(id: strOrInt) {
+    const path = `way/${id}/relation`;
+    return await this.get(path);
+  }
+
+  async redactionNode(id: strOrInt, version: strOrInt, redaction_id: strOrInt) {
+    const path = `node/${id}/${version}/redact?redaction=${redaction_id}`;
+    return await this.post(path);
+  }
+
+  async redactionWay(id: strOrInt, version: strOrInt, redaction_id: strOrInt) {
+    const path = `way/${id}/${version}/redact?redaction=${redaction_id}`;
+    return await this.post(path);
+  }
+
+  async redactionRelation(
+    id: strOrInt,
+    version: strOrInt,
+    redaction_id: strOrInt
+  ) {
+    const path = `relation/${id}/${version}/redact?redaction=${redaction_id}`;
+    return await this.post(path);
+  }
+
+  async getGpsPoint(
+    { left, bottom, right, top }: boxT,
+    pageNumber: string | number
+  ) {
+    const path = `trackpoints?bbox=${left},${bottom},${right},${top}&page=${pageNumber}`;
+    return await this.get(path);
+  }
+
+  async createGpx(body: any) {
+    const path = `gpx/create`;
+    return await this.post(path, this.multiPartFormHeader, body);
+  }
+
+  async updateGpx(id:strOrInt){
+    
   }
 }
