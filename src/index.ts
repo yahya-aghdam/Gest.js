@@ -510,4 +510,9 @@ export default class Gest {
     const path = `notes/search?q=${params}`;
     return await this.get(path);
   }
+
+  async getRSSFeed(){
+    const path = `notes/feed`
+    return await this.get(path)
+  }
 }
