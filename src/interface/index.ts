@@ -34,3 +34,24 @@ export type changesetGetQueryT = {
 };
 
 export type strOrInt = string | number;
+
+export interface noteBodyT {
+  lat: number;
+  lon: number;
+  text: string;
+}
+
+type GenerateRange<Min extends number, Max extends number> = {
+  [K in Min | Exclude<number, Max>]: K;
+};
+
+export interface searchTermT{
+  "limit": GenerateRange<1, 1000>
+  "closed": number
+  "display_name": string
+  "user": string
+  "from": string
+  "to": string
+  "sort": "created_at" | "updated_at"
+  "order": "oldest" | "newest"
+}

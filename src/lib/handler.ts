@@ -1,5 +1,5 @@
 import urljoin from "url-join";
-import { fetchInputT } from "../interface/index";
+import { fetchInputT, searchTermT } from "../interface/index";
 
 export async function fetcher(
   url: string,
@@ -30,4 +30,27 @@ export async function fetcher(
   } else {
     throw new Error("Content-Type header not found");
   }
+}
+
+export function interfaceToURLSearchParams(data: searchTermT): URLSearchParams {
+  const searchParams = new URLSearchParams();
+
+  // Define the keys to include in the URLSearchParams
+  const keysToInclude: (keyof searchTermT)[] = [
+    "limit",
+    "closed",
+    "display_name",
+    "user",
+    "from",
+    "to",
+    "sort",
+    "order",
+  ];
+
+  for (const key of keysToInclude) {
+    const value = data[key];
+    searchParams.append(key, String(value));
+  }
+
+  return searchParams;
 }

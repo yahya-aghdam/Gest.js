@@ -1,6 +1,12 @@
 import isEmpty from "lodash/isEmpty";
-import { boxT, changesetGetQueryT, strOrInt } from "./interface";
-import { fetcher } from "./lib/handler";
+import {
+  boxT,
+  changesetGetQueryT,
+  noteBodyT,
+  searchTermT,
+  strOrInt,
+} from "./interface";
+import { fetcher, interfaceToURLSearchParams } from "./lib/handler";
 import { url } from "./lib/url";
 import urljoin from "url-join";
 
@@ -24,9 +30,13 @@ export default class Gest {
     "Content-Type": "multipart/form-data",
   };
 
-  private textHeader: any ={
-    'Content-Type': 'text/plain', 
-  }
+  private textHeader: any = {
+    "Content-Type": "text/plain",
+  };
+
+  private jsonHeader: any = {
+    "Content-Type": "application/json",
+  };
 
   jsonDefiner(path: string, returnMethod: "xml" | "json" = "json") {
     let returnPath = path;
@@ -423,15 +433,81 @@ export default class Gest {
     return await this.get(path);
   }
 
-  async uploadPreferences(body: any){
-    const path = `/user/preferences`
-    return await this.put(path,this.textHeader,body)
+  async uploadPreferences(body: any) {
+    const path = `/user/preferences`;
+    return await this.put(path, this.textHeader, body);
   }
 
-  async getPreferencesWithKey(key:strOrInt){
-    const path = `user/preferences/${key}`
-    return await this.get(path)
+  async getPreferencesWithKey(key: strOrInt) {
+    const path = `user/preferences/${key}`;
+    return await this.get(path);
   }
 
+  async setPreferenceWithKey(key: strOrInt, body: any) {
+    const path = `user/preferences/${key}`;
+    return await this.put(path, this.textHeader, body);
+  }
 
+  async deletePreferenceWithKey(key: strOrInt) {
+    const path = `user/preferences/${key}`;
+    return await this.delete(path);
+  }
+
+  async getNotes(
+    { left, bottom, right, top }: boxT,
+    returnMethod: "json" | "xml" = "json"
+  ) {
+    const path = `${this.jsonDefiner(
+      "notes",
+      returnMethod
+    )}?bbox=${left},${bottom},${right},${top}`;
+    return await this.get(path);
+  }
+
+  async getAllNotes(returnMethod: "json" | "xml" = "json") {
+    const path = `${this.jsonDefiner("notes", returnMethod)}`;
+    return await this.get(path);
+  }
+
+  async getNote(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+    const path = `${this.jsonDefiner("notes", returnMethod)}/${id}`;
+    return await this.get(path);
+  }
+
+  async createNoteXml(text: string, { lat, lon }: { [key: string]: strOrInt }) {
+    const path = `notes?lat=${lat}&lon=${lon}&text=${text}`;
+    return await this.post(path);
+  }
+
+  async createNoteJson(body: noteBodyT) {
+    const path = `notes.json`;
+    return await this.post(path, this.jsonHeader, body);
+  }
+
+  async createNoteCommentXml(id: strOrInt, comment: string) {
+    const path = `notes/${id}/comment?text=${comment}`;
+    return await this.post(path);
+  }
+
+  async closeNote(id: strOrInt, comment: string) {
+    const path = `notes/${id}/close?text=${comment}`;
+    return await this.post(path);
+  }
+
+  async reopenNote(id: strOrInt, comment: string) {
+    const path = `notes/${id}/reopen?text=${comment}`;
+    return await this.post(path);
+  }
+
+  async hideNote(id: strOrInt, comment: string) {
+    const path = `notes/${id}?text=${comment}`;
+    return await this.delete(path);
+  }
+
+  async searchNotes(searchTerms: searchTermT) {
+    const searchParams = interfaceToURLSearchParams(searchTerms);
+    const params = new URLSearchParams(searchParams).toString();
+    const path = `notes/search?q=${params}`;
+    return await this.get(path);
+  }
 }
