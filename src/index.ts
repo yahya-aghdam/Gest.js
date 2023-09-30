@@ -24,6 +24,10 @@ export default class Gest {
     "Content-Type": "multipart/form-data",
   };
 
+  private textHeader: any ={
+    'Content-Type': 'text/plain', 
+  }
+
   jsonDefiner(path: string, returnMethod: "xml" | "json" = "json") {
     let returnPath = path;
     if (returnMethod == "json") returnPath += ".json";
@@ -368,7 +372,66 @@ export default class Gest {
     return await this.post(path, this.multiPartFormHeader, body);
   }
 
-  async updateGpx(id:strOrInt){
-    
+  //! auth needed
+  async updateGpx(id: strOrInt, body: any) {
+    const path = `gpx/${id}`;
+    return await this.put(path, this.multiPartFormHeader, body);
   }
+
+  //! auth needed
+  async deleteGpx(id: strOrInt, body: any) {
+    const path = `gpx/${id}`;
+    return await this.delete(path, this.multiPartFormHeader, body);
+  }
+
+  async downloadMetaDetaGpx(id: strOrInt) {
+    const path = `gpx/${id}/details`;
+    return await this.get(path);
+  }
+
+  async downloadDataGpx(id: strOrInt) {
+    const path = `gpx/${id}/data`;
+    return await this.get(path);
+  }
+
+  //! auth needed
+  async listGpxFiles() {
+    const path = `user/gpx_files`;
+    return await this.get(path);
+  }
+
+  async getUserDetail(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+    const path = `user/${this.jsonDefiner(`${id}`, returnMethod)}`;
+    return await this.get(path);
+  }
+
+  async getMultiUsersDetails(
+    ids: strOrInt[],
+    returnMethod: "json" | "xml" = "json"
+  ) {
+    const path = `${this.jsonDefiner("users", returnMethod)}?=users=${ids}`;
+    return await this.get(path);
+  }
+
+  async getDetailOfLoggedInUser(returnMethod: "json" | "xml" = "json") {
+    const path = `user/${this.jsonDefiner("details", returnMethod)}`;
+    return await this.get(path);
+  }
+
+  async getPreferencesOfLoggedInUser(returnMethod: "json" | "xml" = "json") {
+    const path = `user/${this.jsonDefiner("preferences", returnMethod)}`;
+    return await this.get(path);
+  }
+
+  async uploadPreferences(body: any){
+    const path = `/user/preferences`
+    return await this.put(path,this.textHeader,body)
+  }
+
+  async getPreferencesWithKey(key:strOrInt){
+    const path = `user/preferences/${key}`
+    return await this.get(path)
+  }
+
+
 }
