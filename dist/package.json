@@ -1,0 +1,36 @@
+{
+  "name": "gest",
+  "version": "1.0.0",
+  "description": "SDK for working with openStreetMap REST API",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+    "scripts": {
+    "test": "node ./test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scorpio-demon/Gest.js.git"
+  },
+  "keywords": [
+    "Nest",
+    "Nest.js",
+    "geocoding",
+    "map",
+    "SDK",
+    "openStreetMap",
+    "Open",
+    "Street",
+    "Map",
+    "OSM"
+  ],
+  "author": "Radmehr Aghdam",
+  "license": "MIT",
+  "types": "./index.d.ts",
+  "bugs": {
+    "url": "https://github.com/scorpio-demon/Gest.js/issues"
+  },
+  "homepage": "https://github.com/scorpio-demon/Gest.js#readme"
+}
