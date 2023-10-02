@@ -12,12 +12,19 @@ import urljoin from "url-join";
 
 const apiVersion = "0.6";
 
+/**
+ * You can do any method in openStreetMap official v0.6 api
+ *
+ * @param {string} apiUrl - (optional) api url for OSM, default is Dev url.
+ * @param {string} apiV - (optional) version of api, default is 0.6
+ */
 export default class Gest {
   constructor(
     private apiUrl: string = url.dev,
     private apiV: string = apiVersion
   ) {}
 
+  //ANCHOR - Headers
   private xmlHeader: any = {
     "Content-Type": "application/xml",
   };
@@ -45,30 +52,40 @@ export default class Gest {
   }
 
   // ANCHOR - Get
-  async get(path: string): Promise<any> {
+  private async get(path: string): Promise<any> {
     const url = urljoin(this.apiUrl, this.apiV);
     return await fetcher(url, path, { method: "GET" });
   }
 
   // ANCHOR - Put
-  async put(path: string, headers?: any, body?: any): Promise<any> {
+  private async put(path: string, headers?: any, body?: any): Promise<any> {
     const url = urljoin(this.apiUrl, this.apiV);
     return await fetcher(url, path, { method: "PUT", headers, body });
   }
 
   // ANCHOR - Post
-  async post(path: string, headers?: any, body?: any): Promise<any> {
+  private async post(path: string, headers?: any, body?: any): Promise<any> {
     const url = urljoin(this.apiUrl, this.apiV);
     return await fetcher(url, path, { method: "POST", headers, body });
   }
 
   // ANCHOR - Delete
-  async delete(path: string, headers?: any, body?: any): Promise<any> {
+  private async delete(path: string, headers?: any, body?: any): Promise<any> {
     const url = urljoin(this.apiUrl, this.apiV);
     return await fetcher(url, path, { method: "DELETE", headers, body });
   }
 
-  async versions(returnMethod: "xml" | "json" = "json") {
+  //ANCHOR - Requests
+
+  /**
+   * Available API versions: GET /api/versions or /api/versions.json
+   *
+   * @param {"xml" | "json"} returnMethod - (optional) choose return method, default is "json".
+   * @return {XMLDocument | JSON | Error}  Returns a list of API versions supported by this instance.
+   */
+  public async versions(
+    returnMethod: "xml" | "json" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     return await fetcher(
       this.apiUrl,
       this.jsonDefiner("versions", returnMethod),
@@ -76,7 +93,15 @@ export default class Gest {
     );
   }
 
-  async capabilities(returnMethod: "xml" | "json" = "json") {
+  /**
+   * This API call is meant to provide information about the capabilities and limitations of the current API.
+   *
+   * @param {"xml" | "json"} returnMethod - (optional) choose return method, default is "json".
+   * @return {XMLDocument | JSON | Error}  Returns a XML document (content type text/xml)
+   */
+  public async capabilities(
+    returnMethod: "xml" | "json" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     return await fetcher(
       this.apiUrl,
       this.jsonDefiner("capabilities", returnMethod),
@@ -84,47 +109,80 @@ export default class Gest {
     );
   }
 
-  async map({ left, bottom, right, top }: boxT) {
+  /**
+   * Retrieving map data by bounding box: GET /api/0.6/map
+   *
+   * @param {boxT} boxObj - left is the longitude of the left (westernmost) side of the bounding box.
+bottom is the latitude of the bottom (southernmost) side of the bounding box.
+right is the longitude of the right (easternmost) side of the bounding box.
+top is the latitude of the top (northernmost) side of the bounding box.
+   * @return {XMLDocument | Error}  All nodes that are inside a given bounding box and any relations that reference them.
+All ways that reference at least one node that is inside a given bounding box, any relations that reference them [the ways], and any nodes outside the bounding box that the ways may reference.
+All relations that reference one of the nodes, ways or relations included due to the above rules. (Does not apply recursively, see explanation below.)
+   */
+  public async map({
+    left,
+    bottom,
+    right,
+    top,
+  }: boxT): Promise<XMLDocument | Error> {
     const path = `map?bbox=${left},${bottom},${right},${top}`;
     return await this.get(path);
   }
 
-  async permissions(returnMethod: "json" | "xml" = "json") {
+  /**
+   * Retrieving permissions: GET /api/0.6/permissions or /api/0.6/permissions.json
+   *
+   * @param {"xml" | "json"} returnMethod - (optional) choose return method, default is "json".
+   * @return {XMLDocument | JSON | Error}  If the API client is not authorized, an empty list of permissions will be returned.
+If the API client uses Basic Auth, the list of permissions will contain all permissions.
+If the API client uses OAuth 1.0a, the list will contain the permissions actually granted by the user.
+If the API client uses OAuth 2.0, the list will be based on the granted scopes.
+Note that for compatibility reasons, all OAuth 2.0 scopes will be prefixed by "allow_", e.g. scope "read_prefs" will be shown as permission "allow_read_prefs".
+   */
+  public async permissions(
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     return await this.get(this.jsonDefiner("permissions", returnMethod));
   }
 
-  async changesetCreate(xmlBody: any) {
+  public async changesetCreate(xmlBody: any): Promise<XMLDocument | Error> {
     const path = "changeset/create";
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async changesetGet(
+  public async changesetGet(
     id: strOrInt,
     include_discussion: boolean = true,
     returnMethod: "json" | "xml" = "json"
-  ) {
+  ): Promise<XMLDocument | JSON | Error> {
     const editedPath = this.jsonDefiner(`changeset/${id}`, returnMethod);
     const path = `${editedPath}?include_discussion=${include_discussion}`;
     return await this.get(path);
   }
 
-  async changesetUpdate(id: strOrInt, xmlBody: any) {
+  public async changesetUpdate(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `changeset/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async changesetClose(id: strOrInt) {
+  public async changesetClose(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `changeset/${id}/close`;
     return await this.put(path);
   }
 
-  async changesetDownload(id: strOrInt) {
+  public async changesetDownload(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `changeset/${id}/download`;
     return await this.get(path);
   }
 
   //! must be test
-  async changesetGetQuery(inputData: changesetGetQueryT) {
+  public async changesetGetQuery(
+    inputData: changesetGetQueryT
+  ): Promise<XMLDocument | Error> {
     let path: string = "";
 
     if (!isEmpty(inputData.box)) {
@@ -180,283 +238,367 @@ export default class Gest {
     return await this.get(path);
   }
 
-  async changesetDiffUpload(id: strOrInt, xmlBody: any) {
+  public async changesetDiffUpload(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `changeset/${id}/create`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
   //! auth needed
-  async changesetComment(id: strOrInt, comment: any) {
+  public async changesetComment(
+    id: strOrInt,
+    comment: any
+  ): Promise<XMLDocument | Error> {
     const path = `changeset/${id}/create`;
     return await this.post(path, this.formHeader, comment);
   }
 
   //! auth needed
-  async changesetSubscribe(id: strOrInt) {
+  public async changesetSubscribe(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `changeset/${id}/subscribe`;
     return await this.post(path, this.formHeader);
   }
 
   //! auth needed
-  async changesetUnsubscribe(id: strOrInt) {
+  public async changesetUnsubscribe(
+    id: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `changeset/${id}/unsubscribe`;
     return await this.post(path, this.formHeader);
   }
 
   //! auth needed
-  async changesetHideComment(id: strOrInt) {
+  public async changesetHideComment(
+    id: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `changeset/comment/${id}/hide`;
     return await this.post(path);
   }
 
   //! auth needed
-  async changesetUnhideComment(id: strOrInt) {
+  public async changesetUnhideComment(
+    id: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `changeset/comment/${id}/unhide`;
     return await this.post(path);
   }
 
-  async createNode(xmlBody: any) {
+  public async createNode(xmlBody: any): Promise<XMLDocument | Error> {
     const path = `node/create`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async createWay(xmlBody: any) {
+  public async createWay(xmlBody: any): Promise<XMLDocument | Error> {
     const path = `way/create`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async createRelation(xmlBody: any) {
+  public async createRelation(xmlBody: any): Promise<XMLDocument | Error> {
     const path = `relation/create`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async getNode(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+  public async getNode(
+    id: strOrInt,
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `node/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async getWay(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+  public async getWay(
+    id: strOrInt,
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `way/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async getRelation(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+  public async getRelation(
+    id: strOrInt,
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `relation/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async updateNode(id: strOrInt, xmlBody: any) {
+  public async updateNode(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `node/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async updateWay(id: strOrInt, xmlBody: any) {
+  public async updateWay(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `way/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async updateRelation(id: strOrInt, xmlBody: any) {
+  public async updateRelation(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `relation/${id}`;
     return await this.put(path, this.xmlHeader, xmlBody);
   }
 
-  async deleteNode(id: strOrInt, xmlBody: any) {
+  public async deleteNode(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `node/${id}`;
     return await this.delete(path, this.xmlHeader, xmlBody);
   }
 
-  async deleteWay(id: strOrInt, xmlBody: any) {
+  public async deleteWay(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `way/${id}`;
     return await this.delete(path, this.xmlHeader, xmlBody);
   }
 
-  async deleteRelation(id: strOrInt, xmlBody: any) {
+  public async deleteRelation(
+    id: strOrInt,
+    xmlBody: any
+  ): Promise<XMLDocument | Error> {
     const path = `relation/${id}`;
     return await this.delete(path, this.xmlHeader, xmlBody);
   }
 
-  async getNodeHistory(id: strOrInt) {
+  public async getNodeHistory(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `node/${id}/history`;
     return await this.get(path);
   }
 
-  async getWayHistory(id: strOrInt) {
+  public async getWayHistory(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `way/${id}/history`;
     return await this.get(path);
   }
 
-  async getRelationHistory(id: strOrInt) {
+  public async getRelationHistory(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `relation/${id}/history`;
     return await this.get(path);
   }
 
-  async getNodeVersion(id: strOrInt, version: strOrInt) {
+  public async getNodeVersion(
+    id: strOrInt,
+    version: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `node/${id}/${version}`;
     return await this.get(path);
   }
 
-  async getWayVersion(id: strOrInt, version: strOrInt) {
+  public async getWayVersion(
+    id: strOrInt,
+    version: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `way/${id}/${version}`;
     return await this.get(path);
   }
 
-  async getRelationVersion(id: strOrInt, version: strOrInt) {
+  public async getRelationVersion(
+    id: strOrInt,
+    version: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `relation/${id}/${version}`;
     return await this.get(path);
   }
 
-  async getNodesParameters(parameters: any[]) {
+  public async getNodesParameters(
+    parameters: any[]
+  ): Promise<XMLDocument | Error> {
     const path = `nodes?nodes=${parameters}`;
     return await this.get(path);
   }
 
-  async getWaysParameters(parameters: any[]) {
+  public async getWaysParameters(
+    parameters: any[]
+  ): Promise<XMLDocument | Error> {
     const path = `ways?ways=${parameters}`;
     return await this.get(path);
   }
 
-  async getRelationsParameters(parameters: any[]) {
+  public async getRelationsParameters(
+    parameters: any[]
+  ): Promise<XMLDocument | Error> {
     const path = `relations?relations=${parameters}`;
     return await this.get(path);
   }
 
-  async getRelationsForNode(id: strOrInt) {
+  public async getRelationsForNode(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `node/${id}/relations`;
     return await this.get(path);
   }
 
-  async getRelationsForWay(id: strOrInt) {
+  public async getRelationsForWay(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `way/${id}/relations`;
     return await this.get(path);
   }
 
-  async getRelationsForRelation(id: strOrInt) {
+  public async getRelationsForRelation(
+    id: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `relation/${id}/relations`;
     return await this.get(path);
   }
 
-  async getWaysForNode(id: strOrInt) {
+  public async getWaysForNode(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `node/${id}/ways`;
     return await this.get(path);
   }
 
-  async fullGetWay(id: strOrInt) {
+  public async fullGetWay(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `way/${id}/full`;
     return await this.get(path);
   }
 
-  async fullGetRelation(id: strOrInt) {
+  public async fullGetRelation(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `way/${id}/relation`;
     return await this.get(path);
   }
 
-  async redactionNode(id: strOrInt, version: strOrInt, redaction_id: strOrInt) {
+  public async redactionNode(
+    id: strOrInt,
+    version: strOrInt,
+    redaction_id: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `node/${id}/${version}/redact?redaction=${redaction_id}`;
     return await this.post(path);
   }
 
-  async redactionWay(id: strOrInt, version: strOrInt, redaction_id: strOrInt) {
+  public async redactionWay(
+    id: strOrInt,
+    version: strOrInt,
+    redaction_id: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `way/${id}/${version}/redact?redaction=${redaction_id}`;
     return await this.post(path);
   }
 
-  async redactionRelation(
+  public async redactionRelation(
     id: strOrInt,
     version: strOrInt,
     redaction_id: strOrInt
-  ) {
+  ): Promise<XMLDocument | Error> {
     const path = `relation/${id}/${version}/redact?redaction=${redaction_id}`;
     return await this.post(path);
   }
 
-  async getGpsPoint(
+  public async getGpsPoint(
     { left, bottom, right, top }: boxT,
     pageNumber: string | number
-  ) {
+  ): Promise<XMLDocument | Error> {
     const path = `trackpoints?bbox=${left},${bottom},${right},${top}&page=${pageNumber}`;
     return await this.get(path);
   }
 
-  async createGpx(body: any) {
+  public async createGpx(body: any): Promise<XMLDocument | Error> {
     const path = `gpx/create`;
     return await this.post(path, this.multiPartFormHeader, body);
   }
 
   //! auth needed
-  async updateGpx(id: strOrInt, body: any) {
+  public async updateGpx(
+    id: strOrInt,
+    body: any
+  ): Promise<XMLDocument | Error> {
     const path = `gpx/${id}`;
     return await this.put(path, this.multiPartFormHeader, body);
   }
 
   //! auth needed
-  async deleteGpx(id: strOrInt, body: any) {
+  public async deleteGpx(
+    id: strOrInt,
+    body: any
+  ): Promise<XMLDocument | Error> {
     const path = `gpx/${id}`;
     return await this.delete(path, this.multiPartFormHeader, body);
   }
 
-  async downloadMetaDetaGpx(id: strOrInt) {
+  public async downloadMetaDetaGpx(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `gpx/${id}/details`;
     return await this.get(path);
   }
 
-  async downloadDataGpx(id: strOrInt) {
+  public async downloadDataGpx(id: strOrInt): Promise<XMLDocument | Error> {
     const path = `gpx/${id}/data`;
     return await this.get(path);
   }
 
   //! auth needed
-  async listGpxFiles() {
+  public async listGpxFiles(): Promise<XMLDocument | Error> {
     const path = `user/gpx_files`;
     return await this.get(path);
   }
 
-  async getUserDetail(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+  public async getUserDetail(
+    id: strOrInt,
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `user/${this.jsonDefiner(`${id}`, returnMethod)}`;
     return await this.get(path);
   }
 
-  async getMultiUsersDetails(
+  public async getMultiUsersDetails(
     ids: strOrInt[],
     returnMethod: "json" | "xml" = "json"
-  ) {
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `${this.jsonDefiner("users", returnMethod)}?=users=${ids}`;
     return await this.get(path);
   }
 
-  async getDetailOfLoggedInUser(returnMethod: "json" | "xml" = "json") {
+  public async getDetailOfLoggedInUser(
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `user/${this.jsonDefiner("details", returnMethod)}`;
     return await this.get(path);
   }
 
-  async getPreferencesOfLoggedInUser(returnMethod: "json" | "xml" = "json") {
+  public async getPreferencesOfLoggedInUser(
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `user/${this.jsonDefiner("preferences", returnMethod)}`;
     return await this.get(path);
   }
 
-  async uploadPreferences(body: any) {
+  public async uploadPreferences(body: any): Promise<XMLDocument | Error> {
     const path = `/user/preferences`;
     return await this.put(path, this.textHeader, body);
   }
 
-  async getPreferencesWithKey(key: strOrInt) {
+  public async getPreferencesWithKey(
+    key: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `user/preferences/${key}`;
     return await this.get(path);
   }
 
-  async setPreferenceWithKey(key: strOrInt, body: any) {
+  public async setPreferenceWithKey(
+    key: strOrInt,
+    body: any
+  ): Promise<XMLDocument | Error> {
     const path = `user/preferences/${key}`;
     return await this.put(path, this.textHeader, body);
   }
 
-  async deletePreferenceWithKey(key: strOrInt) {
+  public async deletePreferenceWithKey(
+    key: strOrInt
+  ): Promise<XMLDocument | Error> {
     const path = `user/preferences/${key}`;
     return await this.delete(path);
   }
 
-  async getNotes(
+  public async getNotes(
     { left, bottom, right, top }: boxT,
     returnMethod: "json" | "xml" = "json"
-  ) {
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `${this.jsonDefiner(
       "notes",
       returnMethod
@@ -464,55 +606,77 @@ export default class Gest {
     return await this.get(path);
   }
 
-  async getAllNotes(returnMethod: "json" | "xml" = "json") {
+  public async getAllNotes(
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `${this.jsonDefiner("notes", returnMethod)}`;
     return await this.get(path);
   }
 
-  async getNote(id: strOrInt, returnMethod: "json" | "xml" = "json") {
+  public async getNote(
+    id: strOrInt,
+    returnMethod: "json" | "xml" = "json"
+  ): Promise<XMLDocument | JSON | Error> {
     const path = `${this.jsonDefiner("notes", returnMethod)}/${id}`;
     return await this.get(path);
   }
 
-  async createNoteXml(text: string, { lat, lon }: { [key: string]: strOrInt }) {
+  public async createNoteXml(
+    text: string,
+    { lat, lon }: { [key: string]: strOrInt }
+  ): Promise<XMLDocument | Error> {
     const path = `notes?lat=${lat}&lon=${lon}&text=${text}`;
     return await this.post(path);
   }
 
-  async createNoteJson(body: noteBodyT) {
+  public async createNoteJson(body: noteBodyT): Promise<XMLDocument | Error> {
     const path = `notes.json`;
     return await this.post(path, this.jsonHeader, body);
   }
 
-  async createNoteCommentXml(id: strOrInt, comment: string) {
+  public async createNoteCommentXml(
+    id: strOrInt,
+    comment: string
+  ): Promise<XMLDocument | Error> {
     const path = `notes/${id}/comment?text=${comment}`;
     return await this.post(path);
   }
 
-  async closeNote(id: strOrInt, comment: string) {
+  public async closeNote(
+    id: strOrInt,
+    comment: string
+  ): Promise<XMLDocument | Error> {
     const path = `notes/${id}/close?text=${comment}`;
     return await this.post(path);
   }
 
-  async reopenNote(id: strOrInt, comment: string) {
+  public async reopenNote(
+    id: strOrInt,
+    comment: string
+  ): Promise<XMLDocument | Error> {
     const path = `notes/${id}/reopen?text=${comment}`;
     return await this.post(path);
   }
 
-  async hideNote(id: strOrInt, comment: string) {
+  public async hideNote(
+    id: strOrInt,
+    comment: string
+  ): Promise<XMLDocument | Error> {
     const path = `notes/${id}?text=${comment}`;
     return await this.delete(path);
   }
 
-  async searchNotes(searchTerms: searchTermT) {
+  public async searchNotes(
+    searchTerms: searchTermT
+  ): Promise<XMLDocument | Error> {
     const searchParams = interfaceToURLSearchParams(searchTerms);
     const params = new URLSearchParams(searchParams).toString();
     const path = `notes/search?q=${params}`;
     return await this.get(path);
   }
 
-  async getRSSFeed(){
-    const path = `notes/feed`
-    return await this.get(path)
+  public async getRSSFeed(): Promise<XMLDocument | Error> {
+    const path = `notes/feed`;
+    return await this.get(path);
   }
 }
