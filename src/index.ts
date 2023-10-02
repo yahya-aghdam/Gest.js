@@ -18,7 +18,7 @@ const apiVersion = "0.6";
  * @param {string} apiUrl - (optional) api url for OSM, default is Dev url.
  * @param {string} apiV - (optional) version of api, default is 0.6
  */
-export default class Gest {
+export default class Gestjs {
   constructor(
     private apiUrl: string = url.dev,
     private apiV: string = apiVersion

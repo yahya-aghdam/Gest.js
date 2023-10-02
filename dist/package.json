@@ -1,5 +1,5 @@
 {
-  "name": "gest",
+  "name": "gestjs",
   "version": "1.0.0",
   "description": "SDK for working with openStreetMap REST API",
   "main": "index.js",

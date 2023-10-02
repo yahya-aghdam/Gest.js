@@ -1,9 +1,9 @@
-import Gest from "../index";
+import Gestjs from "../index";
 
-const gest = new Gest();
+const gestjs = new Gestjs();
 
 async function main() {
-  const testVar = await gest.versions()
+  const testVar = await gestjs.versions()
   console.log("🚀 ~ file: test.ts:7 ~ main ~ testVar:", testVar)
 }
 await main();
