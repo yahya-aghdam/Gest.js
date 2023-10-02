@@ -1,5 +1,9 @@
 # Gest.js
 
+<p align="center">
+  <img src="./gestjs.png" alt="gestjs" width="200" height="241" style="display: block; margin: 30 auto" />
+</p>
+
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/scorpio-demon/gestjs/codeql.yml)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Version](https://img.shields.io/badge/Version-1.0.2-orange)
