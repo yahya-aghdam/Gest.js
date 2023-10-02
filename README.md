@@ -1,5 +1,11 @@
 # Gest.js
 
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/scorpio-demon/gestjs/codeql.yml)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Version](https://img.shields.io/badge/Version-1.0.2-orange)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+[![npm](https://img.shields.io/npm/dt/gestjs.svg)](https://www.npmjs.com/package/gestjs)
+
 SDK for working with openStreetMap REST API
 
 You can read more in here: <https://wiki.openstreetmap.org/wiki/API_v0.6>

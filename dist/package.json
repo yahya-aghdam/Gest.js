@@ -1,6 +1,6 @@
 {
   "name": "gestjs",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "SDK for working with openStreetMap REST API",
   "main": "index.js",
   "directories": {
