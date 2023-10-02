@@ -5,7 +5,7 @@ import { boxT, changesetGetQueryT, noteBodyT, searchTermT, strOrNum } from "./in
  * @param {string} apiUrl - (optional) api url for OSM, default is Dev url.
  * @param {string} apiV - (optional) version of api, default is 0.6
  */
-export default class Gest {
+export default class Gestjs {
     private apiUrl;
     private apiV;
     constructor(apiUrl?: string, apiV?: string);
@@ -313,23 +313,23 @@ export default class Gest {
      */
     getRelationsParameters(parameters: any[]): Promise<XMLDocument | Error>;
     /**
-     * Relations for element: GET /api/0.6/node/#id/relations
+     * Relations for node: GET /api/0.6/node/#id/relations
      *
-     * @param {strOrNum} id - The id of element
+     * @param {strOrNum} id - The id of node
      * @return {XMLDocument | Error} Returns a XML document containing all (not deleted) relations in which the given element is used.
      */
     getRelationsForNode(id: strOrNum): Promise<XMLDocument | Error>;
     /**
-     * Relations for element: GET /api/0.6/way/#id/relations
+     * Relations for way: GET /api/0.6/way/#id/relations
      *
-     * @param {strOrNum} id - The id of element
+     * @param {strOrNum} id - The id of way
      * @return {XMLDocument | Error} Returns a XML document containing all (not deleted) relations in which the given element is used.
      */
     getRelationsForWay(id: strOrNum): Promise<XMLDocument | Error>;
     /**
-     * Relations for element: GET /api/0.6/relation/#id/relations
+     * Relations for relation: GET /api/0.6/relation/#id/relations
      *
-     * @param {strOrNum} id - The id of element
+     * @param {strOrNum} id - The id of relation
      * @return {XMLDocument | Error} Returns a XML document containing all (not deleted) relations in which the given element is used.
      */
     getRelationsForRelation(id: strOrNum): Promise<XMLDocument | Error>;
