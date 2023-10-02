@@ -33,7 +33,7 @@ export type changesetGetQueryT = {
   limit?: number | string;
 };
 
-export type strOrInt = string | number;
+export type strOrNum = string | number;
 
 export interface noteBodyT {
   lat: number;
